@@ -6,7 +6,7 @@ This library implements an embedded filesystem mountpoint for usage with devkitP
 ### Usage
 #### Library usage
 Include library's header: `#include <romfs-wiiu.h>`
-Call `romfsInit()` at the start of your app and `romfsExit()` before exiting
+Call `ramfsInit()` at the start of your app and `ramfsInit()` before exiting
 
 #### Makefile
 To generate the romfs, define a ROMFS variable in you makefile containing the path of your romfs folder:

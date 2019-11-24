@@ -82,7 +82,11 @@ static ssize_t romfs_read(struct _reent *r, void *fd, char *ptr, size_t len)
 		len = fobj->fsnode->size - fobj->pos;
 
 	/* copy the requested content */
+  #if defined(__WIIU__)
 	OSBlockMove(ptr, fobj->fsnode->cont + fobj->pos, len, FALSE);
+  #else
+  memcpy(ptr, fobj->fsnode->cont + fobj->pos, len);
+  #endif
 
 	/* advance position by bytes read */
 	fobj->pos += len;
@@ -305,7 +309,7 @@ static int romfs_dirclose(struct _reent *r, DIR_ITER *dirState)
 
 static devoptab_t romfs_devoptab =
 {
-	.name         = "romfs",
+	.name         = "resin",
 	.structSize   = sizeof(romfs_file_t),
 	.open_r       = romfs_open,
 	.close_r      = romfs_close,

@@ -8,16 +8,16 @@ extern "C" {
 #include <stdint.h>
 
 /*
-	romfsInit: mount romfs
+	ramfsInit: mount romfs
 	returns 0 when successful or a negative value for errors
 */
-int32_t romfsInit(void);
+int32_t ramfsInit(void);
 
 /*
-	romfsExit: unmount romfs
+	ramfsExit: unmount romfs
 	returns 0 when successful or a negative value for errors
 */
-int32_t romfsExit(void);
+int32_t ramfsExit(void);
 
 
 #ifdef __cplusplus

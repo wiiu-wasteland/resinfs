@@ -2,24 +2,24 @@ ifneq ($(strip $(V)), 1)
 	Q ?= @
 endif
 
-ifneq ($(strip $(ROMFS)),)
+ifneq (, $(shell which gtar))
+	Q += g
+endif
+
+ifneq ($(strip $(RAMFS_DIR)),)
 
 TOPDIR		?=	.
 
-ROMFS_LIBS	:=	-lromfs-wiiu
-ROMFS_CFLAGS	:=	-I$(DEVKITPRO)/portlibs/wiiu/include
 ROMFS_TARGET	:=	app.romfs.o
 
-%.romfs.o: $(TOPDIR)/$(ROMFS)
+%.romfs.o: $(TOPDIR)/$(RAMFS_DIR)
 	@echo ROMFS $(notdir $@)
-	$(Q)tar -H ustar -cvf romfs.tar -C $(TOPDIR)/$(ROMFS) .
-	$(Q)$(OBJCOPY) --input binary --output elf32-powerpc --binary-architecture powerpc:common romfs.tar $@
+	$(Q)tar -H ustar -cvf romfs.tar -C $(TOPDIR)/$(RAMFS_DIR) .
+	$(PREFIX)ld -r -b binary romfs.tar -o $@
 	@rm -f romfs.tar
 
 else
 
-ROMFS_LIBS	:=
-ROMFS_CFLAGS	:=
 ROMFS_TARGET	:=
 
 endif

@@ -15,7 +15,10 @@
 #include <sys/param.h>
 #include <stdint.h>
 #include <unistd.h>
+
+#if defined(__WIIU__)
 #include <coreinit/memory.h>
+#endif
 
 
 /* include the implementation files (needed for static functions) */
@@ -31,8 +34,8 @@ extern char _binary_romfs_tar_end[];
 /* romfs initialization flag */
 static int32_t romfs_initialised = 0;
 
-/* romfsInit: intialize romfs */
-int32_t romfsInit(void)
+/* ramfsInit: intialize romfs */
+int32_t ramfsInit(void)
 {
 	/* already initialized */
 	if (romfs_initialised)
@@ -54,15 +57,15 @@ int32_t romfsInit(void)
 	return 0;
 }
 
-/* romfsExit: exit romfs */
-int32_t romfsExit(void)
+/* ramfsExit: exit romfs */
+int32_t ramfsExit(void)
 {
 	/* never initialized */
 	if (!romfs_initialised)
 		return -1;
 
 	/* remove the romfs devoptab from devices list */
-	RemoveDevice("romfs:");
+	RemoveDevice("resin:");
 
 	/* deallocate the file tree */
 	node_destroytree(NULL, 0);

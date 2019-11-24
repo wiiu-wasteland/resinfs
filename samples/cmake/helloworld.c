@@ -16,20 +16,20 @@ int main(int argc, char **argv)
 	WHBLogConsoleInit();
 	
 	// initialize romfs library
-	int res = romfsInit();
+	int res = ramfsInit();
 	if (res) {
 		WHBLogPrintf(">> Failed to init romfs: %d", res);
 		goto end;
 	}
 	
 	// open helloworld.txt
-	FILE *fp = fopen("romfs:/helloworld.txt", "r");
+	FILE *fp = fopen("resin:/helloworld.txt", "r");
 	if (fp == NULL) {
 		WHBLogPrint(">> Failed to open file");
 		goto end;
 	}
 	
-	WHBLogPrint(">> Content of romfs:/helloworld.txt:");
+	WHBLogPrint(">> Content of resin:/helloworld.txt:");
 	
 	// output content to console
 	while (fgets(line, sizeof(line), fp) != NULL)
@@ -49,7 +49,7 @@ end:
 		OSSleepTicks(OSMillisecondsToTicks(100));
 
 	// deinitialize romfs library
-	romfsExit();
+	ramfsExit();
 
 	// deinitialize procui/console
 	WHBLogConsoleFree();
