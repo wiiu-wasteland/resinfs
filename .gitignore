@@ -1,3 +1,4 @@
-build/
+wiiu-build/
+switch-build/
 *.bz2
 
