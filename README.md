@@ -1,45 +1,49 @@
-## libromfs-wiiu
+## libramfs
 
 ### Informations  
-This library implements an embedded filesystem mountpoint for usage with devkitPPC aimed at the Nintendo Wii U. The implementations works by statically linking the romfs directory compressed with ustar to the executable.
+This library implements an embedded filesystem mountpoint for usage with devkitPro. The implementations works by statically linking directories ramfs compressed with ustar to the executable.
 
 ### Usage
 #### Library usage
-Include library's header: `#include <romfs-wiiu.h>`
-Call `ramfsInit()` at the start of your app and `ramfsInit()` before exiting
+Include library's header: `#include <ramfs.h>`
+Call `ramfsInit()` at the start of your app and `ramfsExit()` before exiting
 
 #### Makefile
-To generate the romfs, define a ROMFS variable in you makefile containing the path of your romfs folder:
+To generate the ramfs, define a RAMFS_DIR variable in you makefile containing the path of your ramfs folder:
 
-    ROMFS := romfs_example_folder
+    RAMFS_DIR := ramfs_example_folder
 
-Then, include romfs's makefile and add romfs target to your linking targets along with the ld flags (chage the example according to your makefile):
+Then, update your makefile to include ramfs.mk and add ramfs target and flags
+(chage the example according to your makefile, replace TARGET_PLATFORM_HERE with wiiu or switch):
 
-    include $(PORTLIBS_PATH)/wiiu/share/romfs-wiiu.mk
-    CFLAGS		+=	$(ROMFS_CFLAGS)
-    CXXFLAGS	+=	$(ROMFS_CFLAGS)
-    LIBS		+=	$(ROMFS_LIBS)
-    OFILES		+=	$(ROMFS_TARGET)
+    include $(DEVKITPRO)/portlibs/TARGET_PLATFORM_HERE/share/ramfs.mk
+    OFILES		+=	$(RAMFS_TARGET)
+    CFLAGS		+=	-I$(DEVKITPRO)/portlibs/TARGET_PLATFORM_HERE/include
+    CXXFLAGS	+=	-I$(DEVKITPRO)/portlibs/TARGET_PLATFORM_HERE/include
+    LIBS		+=	-lramfs
 
 #### cmake
-Include romfs's cmake file:
+Include ramfs's cmake file:
 
-    include("${DEVKITPRO}/portlibs/wiiu/share/romfs-wiiu.cmake" REQUIRED)
+    include("${DEVKITPRO}/portlibs/wiiu/share/ramfs.cmake" REQUIRED)
 
-Then, call romfs_add to build and link the romfs (make sure it's after all your_project add_executable calls):
+Then, call ramfs_add to build and link the ramfs (make sure it's after all your_project add_executable calls):
 
-    romfs_add(your_project "romfs_example_folder")
+    ramfs_add(your_project "ramfs_example_folder")
 
 ### Installing
-A prebuild version is available at the wiiu-fling pacman repository.
+A prebuild version for wiiu is available at the wiiu-fling pacman repository.
 Please reffer to [these](https://gitlab.com/QuarkTheAwesome/wiiu-fling) instructions to set up wiiu-fling. 
 
 To manually install the library:
 
-    $ git clone https://github.com/yawut/libromfs-wiiu.git
-    $ cd libromfs-wiiu
+Select your target plaftorm (replace TARGET_PLATFORM_HERE with wiiu or switch)
+
+    $ export PLATFORM=TARGET_PLATFORM_HERE
+
+Clone, build and install the library
+
+    $ git clone https://gitlab.com/4TU/resinfs.git
+    $ cd resinfs
     $ make
     $ sudo make install
-
-
-
