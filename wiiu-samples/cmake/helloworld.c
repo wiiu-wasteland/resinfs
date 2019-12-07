@@ -3,7 +3,7 @@
 #include <whb/proc.h>
 #include <whb/log.h>
 #include <whb/log_console.h>
-#include <romfs-wiiu.h>
+#include <ramfs.h>
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -15,10 +15,10 @@ int main(int argc, char **argv)
 	WHBProcInit();
 	WHBLogConsoleInit();
 	
-	// initialize romfs library
+	// initialize ramfs library
 	int res = ramfsInit();
 	if (res) {
-		WHBLogPrintf(">> Failed to init romfs: %d", res);
+		WHBLogPrintf(">> Failed to init ramfs: %d", res);
 		goto end;
 	}
 	
@@ -48,7 +48,7 @@ end:
 	while(WHBProcIsRunning())
 		OSSleepTicks(OSMillisecondsToTicks(100));
 
-	// deinitialize romfs library
+	// deinitialize ramfs library
 	ramfsExit();
 
 	// deinitialize procui/console

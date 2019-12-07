@@ -16,13 +16,13 @@ include $(DEVKITPRO)/wut/share/wut_rules
 # SOURCES is a list of directories containing source code
 # DATA is a list of directories containing data files
 # INCLUDES is a list of directories containing header files
-# ROMFS is a folder to generate app's romfs
+# RAMFS_DIR is a folder to generate app's ramfs
 #-------------------------------------------------------------------------------
-TARGET		:=	romfs-helloworld
+TARGET		:=	ramfs-helloworld
 BUILD		:=	build
 SOURCES		:=	source
 INCLUDES	:=	include
-ROMFS		:=	romfs
+RAMFS_DIR	:=	ramfs
 
 #-------------------------------------------------------------------------------
 # options for code generation
@@ -107,11 +107,11 @@ else
 #-------------------------------------------------------------------------------
 # romfs
 #-------------------------------------------------------------------------------
-include $(PORTLIBS_PATH)/wiiu/share/romfs-wiiu.mk
-CFLAGS		+=	$(ROMFS_CFLAGS)
-CXXFLAGS	+=	$(ROMFS_CFLAGS)
-LIBS		+=	$(ROMFS_LIBS)
-OFILES		+=	$(ROMFS_TARGET)
+include $(PORTLIBS_PATH)/wiiu/share/ramfs.mk
+OFILES		+=	$(RAMFS_TARGET)
+CFLAGS		+=	-I$(DEVKITPRO)/portlibs/wiiu/include
+CXXFLAGS	+=	-I$(DEVKITPRO)/portlibs/wiiu/include
+LIBS		+=	-lramfs
 #-------------------------------------------------------------------------------
 
 DEPENDS		:=	$(OFILES:.o=.d)
