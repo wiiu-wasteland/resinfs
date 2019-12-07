@@ -43,7 +43,7 @@ endif
 # INCLUDES is a list of directories containing header files
 # INSTALL is the directory where the library will be installed
 #-------------------------------------------------------------------------------
-TARGET		:=	ramfs
+TARGET		:=	libramfs
 BUILD		:=	$(PLATFORM)-build
 SOURCES		:=	source
 INCLUDES	:=	include
