@@ -1,2 +1,2 @@
 Hello world!
-This is an example romfs file
+This is an example ramfs file

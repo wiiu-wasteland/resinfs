@@ -15,7 +15,7 @@ TOPDIR		?=	.
 RAMFS_TARGET	:=	app.ramfs.o
 
 %.ramfs.o: $(TOPDIR)/$(RAMFS_DIR)
-	@echo ROMFS $(notdir $@)
+	@echo RAMFS $(notdir $@)
 	$(Q)$(TAR) -H ustar -cvf ramfs.tar -C $(TOPDIR)/$(RAMFS_DIR) .
 	$(Q)$(PREFIX)ld -r -b binary ramfs.tar -o $@
 	@rm -f ramfs.tar
