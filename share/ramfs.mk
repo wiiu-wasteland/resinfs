@@ -2,8 +2,10 @@ ifneq ($(strip $(V)), 1)
 	Q ?= @
 endif
 
-ifneq (, $(shell which gtar))
-	Q += g
+ifneq (, $(shell which gtar 2>/dev/null))
+	TAR := gtar
+else
+	TAR := tar
 endif
 
 ifneq ($(strip $(RAMFS_DIR)),)
@@ -14,8 +16,8 @@ RAMFS_TARGET	:=	app.ramfs.o
 
 %.ramfs.o: $(TOPDIR)/$(RAMFS_DIR)
 	@echo ROMFS $(notdir $@)
-	$(Q)tar -H ustar -cvf ramfs.tar -C $(TOPDIR)/$(RAMFS_DIR) .
-	$(PREFIX)ld -r -b binary ramfs.tar -o $@
+	$(Q)$(TAR) -H ustar -cvf ramfs.tar -C $(TOPDIR)/$(RAMFS_DIR) .
+	$(Q)$(PREFIX)ld -r -b binary ramfs.tar -o $@
 	@rm -f ramfs.tar
 
 else
