@@ -1,11 +1,12 @@
 /*
- * romfs_tar.c
+ * ramfs_tar.c
  * ustar file parsing
  * Copyright (C) 2019 rw-r-r-0644
  */
 
-#ifndef _ROMFS_TAR_C
-#define _ROMFS_TAR_C
+#include "ramfs_internal.h"
+#include <stdint.h>
+#include <string.h>
 
 /* ustar file header definition */
 typedef struct __attribute__((packed))
@@ -38,8 +39,8 @@ static uint32_t oct2bin(char *c, int32_t size)
 	return n;
 }
 
-/* tar_create_entries: create node tree entries for tar's files and folders */
-static void tar_create_entries(char *ptr, char *end)
+/* ramfsCreateFromTar: create node tree entries for tar's files and folders */
+void ramfsCreateFromTar(char *ptr, char *end)
 {
 	tar_header_t *hdr = (tar_header_t *)ptr;
 	tar_header_t *ehdr = (tar_header_t *)end;
@@ -56,11 +57,9 @@ static void tar_create_entries(char *ptr, char *end)
 		/* only files and directories are supported */
 		if (isfile || isdir)
 			/* create a node for the entry */
-			node_createfilepath(hdr->fname, mtime, isdir, fsize, (char *)(hdr + 1));
+			ramfsCreateNode(hdr->fname, mtime, isdir, fsize, (char *)(hdr + 1));
 
 		/* go to the next entry */
 		hdr += ((fsize + 511) / 512) + 1;
 	}
 }
-
-#endif
