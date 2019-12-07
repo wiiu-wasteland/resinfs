@@ -22,9 +22,9 @@
 
 
 /* include the implementation files (needed for static functions) */
-#include "romfs_tree.c.impl"
-#include "romfs_devoptab.c.impl"
-#include "romfs_tar.c.impl"
+#include "ramfs_tree.c.impl"
+#include "ramfs_devoptab.c.impl"
+#include "ramfs_tar.c.impl"
 
 
 /* romfs binary symbols */
