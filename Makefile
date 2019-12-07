@@ -5,13 +5,36 @@
 ifeq ($(strip $(DEVKITPRO)),)
 $(error "Please set DEVKITPRO in your environment. export DEVKITPRO=<path to>/devkitpro")
 endif
-TOPDIR ?= $(CURDIR)
-include $(DEVKITPRO)/wut/share/wut_rules
 
 #-------------------------------------------------------------------------------
-# library version
+# build settings
 #-------------------------------------------------------------------------------
-VERSION		:=	0.6
+PLATFORM	?=	wiiu
+VERSION		:=	0.7
+
+ifeq ($(PLATFORM), wiiu)
+#-------------------------------------------------------------------------------
+# wiiu build config
+#-------------------------------------------------------------------------------
+include $(DEVKITPRO)/wut/share/wut_rules
+ARCH		:=	$(MACHDEP)
+ARCH		+=	-D__WIIU__ -D__WUT__
+LIBDIRS		:=	$(PORTLIBS) $(WUT_ROOT)
+#-------------------------------------------------------------------------------
+else
+ifeq ($(PLATFORM), switch)
+#-------------------------------------------------------------------------------
+# switch build config
+#-------------------------------------------------------------------------------
+include $(DEVKITPRO)/libnx/switch_rules
+ARCH		:=	-march=armv8-a -mtune=cortex-a57 -mtp=soft -fPIC -ftls-model=local-exec
+ARCH		+=	-D__SWITCH__ -D__LIBNX__
+LIBDIRS		:=	$(PORTLIBS) $(LIBNX)
+#-------------------------------------------------------------------------------
+else
+$(error "Specified TARGET unsupported or missing")
+endif
+endif
 
 #-------------------------------------------------------------------------------
 # TARGET is the name of the output
@@ -20,29 +43,25 @@ VERSION		:=	0.6
 # INCLUDES is a list of directories containing header files
 # INSTALL is the directory where the library will be installed
 #-------------------------------------------------------------------------------
-TARGET		:=	libromfs-wiiu
-BUILD		:=	build
+TARGET		:=	ramfs
+BUILD		:=	$(PLATFORM)-build
 SOURCES		:=	source
 INCLUDES	:=	include
-INSTALL		:=	$(PORTLIBS_PATH)/wiiu
+INSTALL		:=	$(DEVKITPRO)/portlibs/$(PLATFORM)
 
 #-------------------------------------------------------------------------------
 # options for code generation
 #-------------------------------------------------------------------------------
-CFLAGS		:=	-Wall -O2 -ffunction-sections \
-			$(MACHDEP)
+CFLAGS		:=	-O2 -Wall -Werror \
+			-ffunction-sections \
+			-fdata-sections \
+			$(ARCH)
 
-CFLAGS		+=	$(INCLUDE) -D__WIIU__ -D__WUT__
+CFLAGS		+=	$(INCLUDE)
 
-CXXFLAGS	:=	$(CFLAGS)
+CXXFLAGS	:=	$(CFLAGS) -fno-rtti -fno-exceptions
 
-ASFLAGS		:=	$(MACHDEP)
-
-#-------------------------------------------------------------------------------
-# list of directories containing libraries, this must be the top level
-# containing include and lib
-#-------------------------------------------------------------------------------
-LIBDIRS		:=	$(PORTLIBS) $(WUT_ROOT)
+ASFLAGS		:=	$(ARCH)
 
 #-------------------------------------------------------------------------------
 # no real need to edit anything past this point unless you need to add additional
@@ -51,7 +70,7 @@ LIBDIRS		:=	$(PORTLIBS) $(WUT_ROOT)
 ifneq ($(BUILD),$(notdir $(CURDIR)))
 #-------------------------------------------------------------------------------
 
-export OUTPUT	:=	$(CURDIR)/$(TARGET)
+export OUTPUT	:=	$(CURDIR)/$(BUILD)/$(TARGET)
 export TOPDIR	:=	$(CURDIR)
 
 export VPATH	:=	$(foreach dir,$(SOURCES),$(CURDIR)/$(dir))
@@ -87,17 +106,28 @@ export INCLUDE		:=	$(foreach dir,$(INCLUDES),-I$(CURDIR)/$(dir)) \
 
 dist-bin: all
 	@[ -d lib ] || mkdir -p lib
-	@cp $(TARGET).a lib/
-	@tar --exclude=*~ -cjf $(TARGET)-$(VERSION).tar.bz2 include lib share
+	@cp $(OUTPUT).a lib/
+	@tar --exclude=*~ -cjf $(TARGET)-$(VERSION)-$(PLATFORM).tar.bz2 \
+		include \
+		share \
+		lib
+	@rm -rf lib
 
 dist-src:
-	@tar --exclude=*~ -cjf $(TARGET)-src-$(VERSION).tar.bz2 include share source Makefile
+	@tar --exclude=*~ -cjf $(TARGET)-src-$(VERSION)-$(PLATFORM).tar.bz2 \
+		include \
+		samples \
+		share \
+		source \
+		Makefile \
+		LICENSE \
+		README.md
 
 dist: dist-src dist-bin
 
 install: dist-bin
 	mkdir -p $(DESTDIR)$(INSTALL)
-	bzip2 -cd $(TARGET)-$(VERSION).tar.bz2 | tar -xf - -C $(DESTDIR)$(INSTALL)
+	bzip2 -cd $(TARGET)-$(VERSION)-$(PLATFORM).tar.bz2 | tar -xf - -C $(DESTDIR)$(INSTALL)
 
 all: $(BUILD)
 
@@ -108,7 +138,7 @@ $(BUILD): $(SRCFILES)
 #-------------------------------------------------------------------------------
 clean:
 	@echo clean ...
-	@rm -rf $(BUILD) $(TARGET).a lib
+	@rm -rf $(BUILD)
 
 #-------------------------------------------------------------------------------
 else
