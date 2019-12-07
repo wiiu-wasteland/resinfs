@@ -6,26 +6,25 @@
 
 #include "ramfs_internal.h"
 #include <sys/iosupport.h>
-#include <stdint.h>
 
-/* romfs binary symbols */
-extern char _binary_romfs_tar_start[];
-extern char _binary_romfs_tar_end[];
+/* ramfs binary symbols */
+extern char _binary_ramfs_tar_start[];
+extern char _binary_ramfs_tar_end[];
 
-/* romfs initialization flag */
-static int32_t ramfs_initialised = 0;
+/* ramfs initialization flag */
+static int ramfs_initialised = 0;
 
-/* ramfsInit: intialize romfs */
-int32_t ramfsInit(void)
+/* ramfsInit: intialize ramfs */
+int ramfsInit(void)
 {
 	/* already initialized */
 	if (ramfs_initialised)
 		return 0;
 
-	/* create romfs file entries */
-	ramfsCreateFromTar(_binary_romfs_tar_start, _binary_romfs_tar_end);
+	/* create ramfs file entries */
+	ramfsCreateFromTar(_binary_ramfs_tar_start, _binary_ramfs_tar_end);
 
-	/* add the romfs devoptab to devices list */
+	/* add the ramfs devoptab to devices list */
 	if (AddDevice(&ramfsDevoptab) == -1)
 	{
 		ramfsDestroyNodes(NULL, 0);
@@ -38,14 +37,14 @@ int32_t ramfsInit(void)
 	return 0;
 }
 
-/* ramfsExit: exit romfs */
-int32_t ramfsExit(void)
+/* ramfsExit: exit ramfs */
+int ramfsExit(void)
 {
 	/* never initialized */
 	if (!ramfs_initialised)
 		return -1;
 
-	/* remove the romfs devoptab from devices list */
+	/* remove the ramfs devoptab from devices list */
 	RemoveDevice("resin:");
 
 	/* deallocate the file tree */
