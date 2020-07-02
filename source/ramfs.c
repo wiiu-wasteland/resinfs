@@ -14,8 +14,8 @@ extern char _binary_ramfs_tar_end[];
 /* ramfs initialization flag */
 static int ramfs_initialised = 0;
 
-/* ramfsInit: intialize ramfs */
-int ramfsInit(void)
+/* ramfsMountDefault: mount the default ramfs to the default mountpoint */
+int ramfsMountDefault(void)
 {
 	/* already initialized */
 	if (ramfs_initialised)
@@ -37,8 +37,8 @@ int ramfsInit(void)
 	return 0;
 }
 
-/* ramfsExit: exit ramfs */
-int ramfsExit(void)
+/* ramfsUnmountDefault: unmount the default ramfs mounpoint */
+int ramfsUnmountDefault(void)
 {
 	/* never initialized */
 	if (!ramfs_initialised)
@@ -54,4 +54,15 @@ int ramfsExit(void)
 	ramfs_initialised = 0;
 
 	return 0;
+}
+
+
+int ramfsMount(char *mountpoint, void *ramfsStart, void *ramfsEnd)
+{
+	
+}
+
+int ramfsUnmount(char *mountpoint)
+{
+	
 }

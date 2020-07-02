@@ -94,9 +94,9 @@ static ssize_t ramfs_read(struct _reent *r, void *fd, char *ptr, size_t len)
 
 	/* copy the requested content */
 #if defined(__WIIU__)
-	OSBlockMove(ptr, fobj->fsnode->cont + fobj->pos, len, FALSE);
+	OSBlockMove(ptr, fobj->fsnode->ptr + fobj->pos, len, FALSE);
 #else
-	memcpy(ptr, fobj->fsnode->cont + fobj->pos, len);
+	memcpy(ptr, fobj->fsnode->ptr + fobj->pos, len);
 #endif
 
 	/* advance position by bytes read */
@@ -243,7 +243,7 @@ static DIR_ITER* ramfs_diropen(struct _reent *r, DIR_ITER *dirState, const char 
 	}
 
 	/* initialize directory iterator to the first entry */
-	dirobj->ent = dirobj->fsdir->ent;
+	dirobj->sub = dirobj->fsdir->sub;
 	dirobj->idx = 0;
 
 	return dirState;
@@ -254,7 +254,7 @@ static int ramfs_dirreset(struct _reent *r, DIR_ITER *dirState)
 	ramfs_dir_t* dirobj = (ramfs_dir_t*)(dirState->dirStruct);
 
 	/* reset directory iterator to the first entry */
-	dirobj->ent = dirobj->fsdir->ent;
+	dirobj->sub = dirobj->fsdir->sub;
 	dirobj->idx = 0;
 
 	return 0;
@@ -294,7 +294,7 @@ static int ramfs_dirnext(struct _reent *r, DIR_ITER *dirState, char *filename, s
 	}
 
 	/* the directory is empty */	
-	if (!dirobj->ent)
+	if (!dirobj->sub)
 	{
 		r->_errno = ENOENT;
 		return -1;
@@ -302,12 +302,12 @@ static int ramfs_dirnext(struct _reent *r, DIR_ITER *dirState, char *filename, s
 
 	/* write entry data */
 	memset(filestat, 0, sizeof(*filestat));
-	filestat->st_ino = dirobj->ent->inode;
-	filestat->st_mode = (dirobj->ent->type == RAMFS_FILE) ? RAMFS_FILE_MODE : RAMFS_DIR_MODE;
-	strcpy(filename, dirobj->ent->name);
+	filestat->st_ino = dirobj->sub->inode;
+	filestat->st_mode = (dirobj->sub->type == RAMFS_FILE) ? RAMFS_FILE_MODE : RAMFS_DIR_MODE;
+	strcpy(filename, dirobj->sub->name);
 
 	/* go to the next entry */
-	dirobj->ent = dirobj->ent->next;
+	dirobj->sub = dirobj->sub->next;
 
 	return 0;
 }

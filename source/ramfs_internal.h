@@ -11,13 +11,27 @@
 #include <stdint.h>
 #include <time.h>
 
-typedef enum
-{
-	RAMFS_DIR,
-	RAMFS_FILE,
-} ramfsNodeType;
-
+typedef enum ramfsNodeType ramfsNodeType;
 typedef struct ramfsNode ramfsNode;
+typedef struct ramfsPrivate ramfsPrivate;
+typedef struct ustarHeader ustarHeader;
+
+enum ramfsNodeType
+{
+	RAMFS_FILE = (1 << 0),
+	RAMFS_LINK = (1 << 1),
+	RAMFS_DIR  = (1 << 5),
+};
+
+stuct ramfsPrivate
+{
+	ramfsNode root;
+	ramfsNode *cwd;
+	uint32_t inodes;
+};
+
+
+
 struct ramfsNode
 {
 	char *name;
@@ -26,23 +40,23 @@ struct ramfsNode
 	ramfsNodeType type;
 	time_t mtime;
 	union {
-		/* cont: file content for files */
-		char *cont;
-		/* ent: subdirectory entry for directories */
-		ramfsNode *ent;
+		/* RAMFS_FILE: file content */
+		char *ptr;
+		/* RAMFS_DIR:  first directory entry */
+		ramfsNode *sub;
+		/* RAMFS_LINK: link target node */
+		ramfsNode *lnk;
 	};
 	ramfsNode *next;
 	ramfsNode *up;
 };
 
-void ramfsCreateNode (const char *cpath, time_t mtime, int32_t isdir, uint32_t size, char *content);
-void ramfsDestroyNodes (ramfsNode *n, int32_t recursion);
-ramfsNode *ramfsGetNode (const char *cpath);
+void ramfsCreateNode (ramfsPrivate *ramfs, ustarHeader *hdr);
+void ramfsDestroyNodes (ramfsPrivate *ramfs);
+ramfsNode *ramfsFindPath (ramfsPrivate *ramfs, const char *path);
 
 void ramfsCreateFromTar(char *ptr, char *end);
 
 extern devoptab_t ramfsDevoptab;
-extern ramfsNode ramfsRoot;
-extern ramfsNode *ramfsCwd;
 
 #endif
